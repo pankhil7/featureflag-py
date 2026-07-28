@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models.evaluate import EvaluateResponse
+from app.models.response.evaluate import EvaluateResponse
 from app.middleware.ratelimiter import rate_limit_eval
 from app.store import flag_store
 from app.hash import compute_hash

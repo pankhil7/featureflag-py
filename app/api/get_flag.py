@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models.get_flag import GetFlagResponse
+from app.models.response.get_flag import GetFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 

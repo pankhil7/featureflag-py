@@ -2,7 +2,8 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.models.create_flag import CreateFlagRequest, CreateFlagResponse
+from app.models.request.create_flag import CreateFlagRequest
+from app.models.response.create_flag import CreateFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 

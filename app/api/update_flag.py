@@ -2,7 +2,8 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models.update_flag import UpdateFlagRequest, UpdateFlagResponse
+from app.models.request.update_flag import UpdateFlagRequest
+from app.models.response.update_flag import UpdateFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 

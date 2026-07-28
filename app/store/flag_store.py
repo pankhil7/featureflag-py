@@ -1,7 +1,7 @@
 from typing import Optional
 from app.database import get_connection
-from app.models.create_flag import CreateFlagRequest
-from app.models.update_flag import UpdateFlagRequest
+from app.models.request.create_flag import CreateFlagRequest
+from app.models.request.update_flag import UpdateFlagRequest
 
 
 def _row_to_dict(row: dict) -> dict:
