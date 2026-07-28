@@ -13,12 +13,12 @@ import time
 from fastapi import Depends, HTTPException, status
 from app.redis_client import redis_client
 from app.middleware.auth import get_api_key
-from app.models import APIKey
+from app.config import settings
 
 # ---------------------------------------------------------------------------
 # Lua script — token bucket
 # ---------------------------------------------------------------------------
-# KEYS[1]  base Redis key  e.g. "ratelimit:<api_key_id>:eval"
+# KEYS[1]  base Redis key  e.g. "ratelimit:<api_key>:eval"
 # ARGV[1]  current timestamp (float seconds)
 # ARGV[2]  capacity  (integer)
 # ARGV[3]  refill_rate (tokens per second, float)
@@ -60,12 +60,12 @@ return 1
 _script = redis_client.register_script(_LUA_RATE_LIMIT)
 
 
-def _check(api_key: APIKey, bucket: str, multiplier: float) -> None:
+def _check(api_key: str, bucket: str, multiplier: float) -> None:
     """Run the Lua script for the given bucket. Raises 429 if rate-limited."""
-    redis_key = f"ratelimit:{api_key.id}:{bucket}"
+    redis_key = f"ratelimit:{api_key}:{bucket}"
     now = time.time()
-    capacity = int(api_key.capacity * multiplier)
-    refill_rate = api_key.refill_rate * multiplier
+    capacity = int(settings.rate_limit_capacity * multiplier)
+    refill_rate = settings.rate_limit_refill_rate * multiplier
 
     result = _script(keys=[redis_key], args=[now, capacity, refill_rate])
     if result == 0:
@@ -76,16 +76,16 @@ def _check(api_key: APIKey, bucket: str, multiplier: float) -> None:
 
 
 # ---------------------------------------------------------------------------
-# FastAPI dependencies — inject after auth so we have the APIKey object
+# FastAPI dependencies — inject after auth so we have the key string
 # ---------------------------------------------------------------------------
 
-def rate_limit_eval(api_key: APIKey = Depends(get_api_key)) -> APIKey:
+def rate_limit_eval(api_key: str = Depends(get_api_key)) -> str:
     """Strict rate limit for /evaluate — uses configured limits as-is (1×)."""
     _check(api_key, "eval", multiplier=1.0)
     return api_key
 
 
-def rate_limit_crud(api_key: APIKey = Depends(get_api_key)) -> APIKey:
+def rate_limit_crud(api_key: str = Depends(get_api_key)) -> str:
     """Permissive rate limit for CRUD routes — 10× the configured limits."""
     _check(api_key, "crud", multiplier=10.0)
     return api_key

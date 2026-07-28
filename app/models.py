@@ -3,18 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-# ---------------------------------------------------------------------------
-# API Key
-# ---------------------------------------------------------------------------
-
-class APIKey(BaseModel):
-    id: str
-    key: str
-    name: str
-    capacity: int
-    refill_rate: float
-    created_at: datetime
-
 
 # ---------------------------------------------------------------------------
 # Flag schemas

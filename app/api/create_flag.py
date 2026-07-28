@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.models import APIKey, CreateFlagRequest, FlagResponse
+from app.models import CreateFlagRequest, FlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -20,7 +20,7 @@ router = APIRouter()
 )
 def create_flag(
     req: CreateFlagRequest,
-    api_key: APIKey = Depends(rate_limit_crud),
+    api_key: str = Depends(rate_limit_crud),
 ):
     try:
         flag = flag_store.create(req)

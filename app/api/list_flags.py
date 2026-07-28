@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 
-from app.models import APIKey, FlagResponse
+from app.models import FlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -20,7 +20,7 @@ router = APIRouter()
 )
 def list_flags(
     env: Optional[str] = Query(None, description="Filter by environment"),
-    api_key: APIKey = Depends(rate_limit_crud),
+    api_key: str = Depends(rate_limit_crud),
 ):
     flags = flag_store.list_flags(env)
     logger.debug("flag list env=%s count=%d", env, len(flags))

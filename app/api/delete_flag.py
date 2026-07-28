@@ -2,7 +2,6 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import APIKey
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -20,7 +19,7 @@ router = APIRouter()
 def delete_flag(
     key: str,
     env: str = Query(..., description="Environment is required for delete"),
-    api_key: APIKey = Depends(rate_limit_crud),
+    api_key: str = Depends(rate_limit_crud),
 ):
     deleted = flag_store.delete(key, env)
     if not deleted:

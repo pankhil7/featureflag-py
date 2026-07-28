@@ -44,10 +44,9 @@ services:
       DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/featureflag"
       REDIS_URL: "redis://redis:6379/0"
       PORT: "8080"
-      SEED_API_KEY: "${SEED_API_KEY:-sk_dev}"
-      SEED_API_KEY_NAME: "${SEED_API_KEY_NAME:-dev-key}"
-      SEED_API_KEY_CAPACITY: "${SEED_API_KEY_CAPACITY:-100}"
-      SEED_API_KEY_REFILL_RATE: "${SEED_API_KEY_REFILL_RATE:-10}"
+      API_KEY: "${API_KEY:-sk_dev}"
+      RATE_LIMIT_CAPACITY: "${RATE_LIMIT_CAPACITY:-100}"
+      RATE_LIMIT_REFILL_RATE: "${RATE_LIMIT_REFILL_RATE:-10}"
     ports:
       - "8080:8080"
 

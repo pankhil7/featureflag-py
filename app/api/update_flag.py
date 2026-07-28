@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import APIKey, UpdateFlagRequest, FlagResponse
+from app.models import UpdateFlagRequest, FlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -21,7 +21,7 @@ def update_flag(
     key: str,
     req: UpdateFlagRequest,
     env: str = Query(..., description="Environment is required for update"),
-    api_key: APIKey = Depends(rate_limit_crud),
+    api_key: str = Depends(rate_limit_crud),
 ):
     flag = flag_store.update(key, env, req)
     if flag is None:

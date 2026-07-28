@@ -3,11 +3,9 @@ import time
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import run_migrations
-from app.store import apikey_store
 from app.api import create_flag, list_flags, get_flag, update_flag, delete_flag, evaluate
 
 logging.basicConfig(
@@ -22,16 +20,7 @@ async def lifespan(app: FastAPI):
     # Run on startup.
     logger.info("running migrations")
     run_migrations()
-
-    if settings.seed_api_key:
-        apikey_store.seed(
-            key=settings.seed_api_key,
-            name=settings.seed_api_key_name,
-            capacity=settings.seed_api_key_capacity,
-            refill_rate=settings.seed_api_key_refill_rate,
-        )
-        logger.info("seed api key ready name=%s", settings.seed_api_key_name)
-
+    logger.info("api key loaded from env")
     yield
     # Nothing to clean up.
 

@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import APIKey, EvaluateResponse
+from app.models import EvaluateResponse
 from app.middleware.ratelimiter import rate_limit_eval
 from app.store import flag_store
 from app.hash import compute_hash
@@ -34,7 +34,7 @@ def evaluate_flag(
     key: str,
     env: str = Query(..., description="Environment to evaluate against"),
     user_id: Optional[str] = Query(None, description="Caller identifier for consistent bucketing"),
-    api_key: APIKey = Depends(rate_limit_eval),
+    api_key: str = Depends(rate_limit_eval),
 ):
     flag = flag_store.get_by_key(key, env)
     if flag is None:
@@ -50,7 +50,7 @@ def evaluate_flag(
         return EvaluateResponse(enabled=True)
 
     # Partial rollout — FNV-1a consistent hash.
-    parts = [api_key.key, user_id, key] if user_id else [api_key.key, key]
+    parts = [api_key, user_id, key] if user_id else [api_key, key]
     bucket = compute_hash(*parts) % 100
     enabled = bucket < flag.rollout_percentage
 

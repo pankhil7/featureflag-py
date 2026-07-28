@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import APIKey, FlagResponse
+from app.models import FlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -21,7 +21,7 @@ router = APIRouter()
 def get_flag(
     key: str,
     env: Optional[str] = Query(None, description="Filter by environment"),
-    api_key: APIKey = Depends(rate_limit_crud),
+    api_key: str = Depends(rate_limit_crud),
 ):
     flag = flag_store.get_by_key(key, env)
     if flag is None:
