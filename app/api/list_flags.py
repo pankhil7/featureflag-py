@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 
-from app.models import FlagResponse
+from app.models.get_flag import GetFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get(
     "/flags",
-    response_model=list[FlagResponse],
+    response_model=list[GetFlagResponse],
     summary="List feature flags",
     tags=["Flags"],
 )
@@ -24,4 +24,4 @@ def list_flags(
 ):
     flags = flag_store.list_flags(env)
     logger.debug("flag list env=%s count=%d", env, len(flags))
-    return flags
+    return [GetFlagResponse(**f) for f in flags]

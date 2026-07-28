@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import EvaluateResponse
+from app.models.evaluate import EvaluateResponse
 from app.middleware.ratelimiter import rate_limit_eval
 from app.store import flag_store
 from app.hash import compute_hash
@@ -41,21 +41,21 @@ def evaluate_flag(
         logger.warning("evaluate: flag not found key=%s env=%s", key, env)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
 
-    if not flag.enabled:
+    if not flag["enabled"]:
         logger.debug("evaluate: flag disabled key=%s env=%s", key, env)
         return EvaluateResponse(enabled=False)
 
-    if flag.rollout_percentage == 100:
+    if flag["rollout_percentage"] == 100:
         logger.debug("evaluate: full rollout key=%s env=%s", key, env)
         return EvaluateResponse(enabled=True)
 
     # Partial rollout — FNV-1a consistent hash.
     parts = [api_key, user_id, key] if user_id else [api_key, key]
     bucket = compute_hash(*parts) % 100
-    enabled = bucket < flag.rollout_percentage
+    enabled = bucket < flag["rollout_percentage"]
 
     logger.debug(
         "evaluate: partial rollout key=%s env=%s rollout=%d bucket=%d enabled=%s",
-        key, env, flag.rollout_percentage, bucket, enabled,
+        key, env, flag["rollout_percentage"], bucket, enabled,
     )
     return EvaluateResponse(enabled=enabled)

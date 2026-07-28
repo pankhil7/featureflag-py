@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.models import CreateFlagRequest, FlagResponse
+from app.models.create_flag import CreateFlagRequest, CreateFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.post(
     "/flags",
-    response_model=FlagResponse,
+    response_model=CreateFlagResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Create a feature flag",
     tags=["Flags"],
@@ -32,5 +32,5 @@ def create_flag(
             )
         logger.error("flag create failed: %s", exc)
         raise HTTPException(status_code=500, detail="Internal server error")
-    logger.info("flag created key=%s env=%s", flag.key, flag.environment)
-    return flag
+    logger.info("flag created key=%s env=%s", flag["key"], flag["environment"])
+    return CreateFlagResponse(**flag)

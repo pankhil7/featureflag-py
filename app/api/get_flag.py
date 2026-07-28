@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.models import FlagResponse
+from app.models.get_flag import GetFlagResponse
 from app.middleware.ratelimiter import rate_limit_crud
 from app.store import flag_store
 
@@ -14,7 +14,7 @@ router = APIRouter()
 
 @router.get(
     "/flags/{key}",
-    response_model=FlagResponse,
+    response_model=GetFlagResponse,
     summary="Get a flag by key",
     tags=["Flags"],
 )
@@ -26,4 +26,4 @@ def get_flag(
     flag = flag_store.get_by_key(key, env)
     if flag is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Flag not found")
-    return flag
+    return GetFlagResponse(**flag)
