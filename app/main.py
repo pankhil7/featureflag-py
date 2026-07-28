@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import run_migrations
 from app.store import apikey_store
-from app.routers import flags
+from app.api import create_flag, list_flags, get_flag, update_flag, delete_flag, evaluate
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -98,4 +98,9 @@ def health():
 # Routers
 # ---------------------------------------------------------------------------
 
-app.include_router(flags.router, tags=["Flags"])
+app.include_router(create_flag.router)
+app.include_router(list_flags.router)
+app.include_router(get_flag.router)
+app.include_router(update_flag.router)
+app.include_router(delete_flag.router)
+app.include_router(evaluate.router)
