@@ -1,6 +1,4 @@
 import logging
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.models.response.get_flag import GetFlagResponse
@@ -20,7 +18,7 @@ router = APIRouter()
 )
 def get_flag(
     key: str,
-    env: Optional[str] = Query(None, description="Filter by environment"),
+    env: str = Query(..., description="Environment: dev, staging, prod"),
     api_key: str = Depends(rate_limit_crud),
 ):
     flag = flag_store.get_by_key(key, env)
