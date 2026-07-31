@@ -43,11 +43,11 @@ def evaluate_flag(
 
     if not flag["enabled"]:
         logger.debug("evaluate: flag disabled key=%s env=%s", key, env)
-        return EvaluateResponse(enabled=False)
+        return EvaluateResponse(enabled=False, reason="flag is disabled")
 
     if flag["rollout_percentage"] == 100:
         logger.debug("evaluate: full rollout key=%s env=%s", key, env)
-        return EvaluateResponse(enabled=True)
+        return EvaluateResponse(enabled=True, reason="full rollout")
 
     # Partial rollout — FNV-1a consistent hash.
     parts = [api_key, user_id, key] if user_id else [api_key, key]
@@ -58,4 +58,5 @@ def evaluate_flag(
         "evaluate: partial rollout key=%s env=%s rollout=%d bucket=%d enabled=%s",
         key, env, flag["rollout_percentage"], bucket, enabled,
     )
-    return EvaluateResponse(enabled=enabled)
+    reason = f"partial rollout: bucket {bucket} < {flag['rollout_percentage']}" if enabled else f"partial rollout: bucket {bucket} >= {flag['rollout_percentage']}"
+    return EvaluateResponse(enabled=enabled, reason=reason)
