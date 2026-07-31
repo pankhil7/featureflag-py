@@ -46,14 +46,14 @@ tokens = tokens + elapsed * refill_rate
 if tokens > capacity then tokens = capacity end
 
 if tokens < 1 then
-    redis.call("SET", tokens_key,      tokens)
-    redis.call("SET", last_refill_key, now)
+    redis.call("SETEX", tokens_key,      86400, tokens)
+    redis.call("SETEX", last_refill_key, 86400, now)
     return 0
 end
 
 tokens = tokens - 1
-redis.call("SET", tokens_key,      tokens)
-redis.call("SET", last_refill_key, now)
+redis.call("SETEX", tokens_key,      86400, tokens)
+redis.call("SETEX", last_refill_key, 86400, now)
 return 1
 """
 
