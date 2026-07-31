@@ -76,16 +76,15 @@ def _check(api_key: str, bucket: str, multiplier: float) -> None:
 
 
 # ---------------------------------------------------------------------------
-# FastAPI dependencies — inject after auth so we have the key string
+# Factory — creates a FastAPI dependency for a given bucket and multiplier
 # ---------------------------------------------------------------------------
 
-def rate_limit_eval(api_key: str = Depends(get_api_key)) -> str:
-    """Strict rate limit for /evaluate — uses configured limits as-is (1×)."""
-    _check(api_key, "eval", multiplier=1.0)
-    return api_key
+def _make_rate_limiter(bucket: str, multiplier: float):
+    def dependency(api_key: str = Depends(get_api_key)) -> str:
+        _check(api_key, bucket, multiplier)
+        return api_key
+    return dependency
 
 
-def rate_limit_crud(api_key: str = Depends(get_api_key)) -> str:
-    """Permissive rate limit for CRUD routes — 10× the configured limits."""
-    _check(api_key, "crud", multiplier=10.0)
-    return api_key
+rate_limit_eval = _make_rate_limiter("eval", multiplier=1.0)
+rate_limit_crud = _make_rate_limiter("crud", multiplier=10.0)
